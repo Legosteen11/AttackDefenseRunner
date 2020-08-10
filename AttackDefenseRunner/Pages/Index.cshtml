@@ -6,5 +6,18 @@
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    
+    <form method="post">
+        <fieldset>
+            <legend>Add Docker tag</legend>
+            <div>
+                <label for="Tag">Docker Tag:</label>
+                <input type="text" name="Tag" value="" asp-for="Tag"/>
+            </div>
+            <div>
+                <label>Run!</label>
+                <input type="submit" value="Submit" class="btn-info"/>
+            </div>
+        </fieldset>
+    </form>
 </div>
