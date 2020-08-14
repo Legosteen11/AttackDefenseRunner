@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using AttackDefenseRunner.Util
+@inject RunningSingleton _running
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -27,10 +29,20 @@
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="" asp-page="/Submission">Submission</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
-                    </li>
                     
+                    <!-- TODO: Align this item to the right -->
+                    <!-- TODO: We could maybe do this status and other live stuff with SignalR 
+                                https://dotnet.microsoft.com/apps/aspnet/signalr -->
+                    <li class="nav-item">
+                        @if (_running.Running)
+                        {
+                            <small class="form-text text-muted">Service currently running</small>
+                        }
+                        else
+                        {
+                            <small class="form-text text-muted">Service currently not running</small>
+                        }
+                    </li>
                 </ul>
             </div>
         </div>

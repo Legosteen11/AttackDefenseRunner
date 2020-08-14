@@ -12,17 +12,17 @@
     @if (_running.Running)
     {
         <form method="POST">
-            <button type="submit" class="btn btn-danger btn-lg" asp-route-data="foo" asp-page-handler="StopService">Stop Service</button>
+            <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopService">Stop Service</button>
         </form>
         <small class="form-text text-muted">Service currently running</small>
     }
     else
     {
         <form method="POST">
-            <button type="submit" class="btn btn-success btn-lg" asp-route-data="foo" asp-page-handler="StartService">Start Service</button>
+            <button type="submit" class="btn btn-success btn-lg" asp-page-handler="StartService">Start Service</button>
         </form>
         <small class="form-text text-muted">Service currently not running</small>
-}
+    }
 </div>
 <hr/>
 <div class="container pt-3">
