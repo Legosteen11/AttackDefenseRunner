@@ -1,4 +1,5 @@
 using AttackDefenseRunner.Model;
+using AttackDefenseRunner.Util;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -19,9 +20,17 @@ namespace AttackDefenseRunner
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // General
             services.AddRazorPages();
 
+            // Db Contexts
             services.AddDbContext<ADRContext>();
+            
+            // Scoped
+            services.AddScoped<SettingsHelper>();
+
+            // Singletons
+            services.AddSingleton<RunningSingleton>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

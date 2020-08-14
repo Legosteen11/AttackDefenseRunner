@@ -1,13 +1,28 @@
 ﻿@page
+@using AttackDefenseRunner.Util
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
+@inject RunningSingleton _running
 
 <h1 class="display-4">Welcome</h1>
+
 <div class="container pt-3">
-    <button onclick="toggleServiceRunning()" type="button" class="btn btn-success btn-lg">Start service</button>
-    <small class="form-text text-muted">Service currently not running</small>
+    @if (_running.Running)
+    {
+        <form method="POST">
+            <button type="submit" class="btn btn-danger btn-lg" asp-route-data="foo" asp-page-handler="StopService">Stop Service</button>
+        </form>
+        <small class="form-text text-muted">Service currently running</small>
+    }
+    else
+    {
+        <form method="POST">
+            <button type="submit" class="btn btn-success btn-lg" asp-route-data="foo" asp-page-handler="StartService">Start Service</button>
+        </form>
+        <small class="form-text text-muted">Service currently not running</small>
+}
 </div>
 <hr/>
 <div class="container pt-3">

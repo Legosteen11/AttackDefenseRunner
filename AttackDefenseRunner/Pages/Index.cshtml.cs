@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AttackDefenseRunner.Util;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Serilog;
 
@@ -6,33 +7,23 @@ namespace AttackDefenseRunner.Pages
 {
     public class IndexModel : PageModel
     {
-        [BindProperty]
-        public string DockerTag { get; set; }
-        
-        [BindProperty]
-        public string FlagRegex { get; set; }
-        
-        [BindProperty]
-        public string VulnServers { get; set; }
-        
-        [BindProperty]
-        public string AttackServers { get; set; }
-        public void OnGet()
+        private RunningSingleton _running { get; }
+
+        public IndexModel(RunningSingleton running)
         {
+            _running = running;
         }
 
-        public void OnPost()
+        public void OnPostStartService()
         {
-            var dockertag = DockerTag;
-            var flagregex = FlagRegex;
-            var vulnservers = VulnServers;
-            var attackservers = AttackServers;
-            
-            Log.Information("Docker Tag is {dockertag}", dockertag);
-            Log.Information("Flag regex is {flagregex}", flagregex);
-            Log.Information("Vulnerable servers are {vulnservers}", vulnservers);
-            Log.Information("Attacking servers are {attackservers}", attackservers);
-
+            Log.Information("Started Service");
+            _running.Running = true;
+        }
+        
+        public void OnPostStopService()
+        {
+            Log.Information("Stopped Service");
+            _running.Running = false;
         }
     }
 }
