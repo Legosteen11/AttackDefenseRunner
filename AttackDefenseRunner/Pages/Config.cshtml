@@ -1,0 +1,36 @@
+﻿@page
+@model ConfigModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<h1 class="display-4">Config</h1>
+<div class="container pt-3">
+    <h2>Enter startup information</h2>
+    <form method="post">
+        <div class="form-group">
+            <label for="FlagRegex">Flag regex:</label>
+            <input id="FlagRegex" type="text" class="form-control" name="FlagRegex" value="" asp-for="FlagRegex"/>
+        </div>
+        <div class="form-group">
+            <label for="VulnServers">Vulnerable servers:</label>
+            <input id="VulnServers" type="text" class="form-control" name="VulnServers" value="" asp-for="VulnServers"/>
+        </div>
+        <div class="form-group">
+            <label for="AttackServers">Attacking servers:</label>
+            <input id="AttackServers" type="text" class="form-control" name="AttackServers" value="" asp-for="AttackServers"/>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+<hr/>
+<div class="container pt-3">
+    <button onclick="toggleServiceRunning()" type="button" class="btn btn-success btn-lg">Start service</button>
+    <small class="form-text text-muted">Service currently not running</small>
+</div>
+
+<script>
+function toggleServiceRunning() {
+    
+}
+</script>
