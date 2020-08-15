@@ -10,7 +10,7 @@ namespace AttackDefenseRunner.Util
         {
             Log.Information("Starting Service");
             
-            
+            //TODO: actually start service
             
             
             Running = true;
@@ -22,7 +22,8 @@ namespace AttackDefenseRunner.Util
         {
             Log.Information("Stopping Service");
             
-            
+            //TODO: actually stop service
+
             
             Running = false;
             Log.Information("Stopped Service");

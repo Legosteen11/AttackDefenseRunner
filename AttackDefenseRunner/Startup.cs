@@ -31,6 +31,9 @@ namespace AttackDefenseRunner
 
             // Singletons
             services.AddSingleton<RunningSingleton>();
+
+            // SignalR
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -54,7 +57,11 @@ namespace AttackDefenseRunner
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+                endpoints.MapHub<MonitorHub>("/monitor")
+            });
         }
     }
 }
