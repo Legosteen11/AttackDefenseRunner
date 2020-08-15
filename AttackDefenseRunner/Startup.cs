@@ -1,3 +1,4 @@
+using AttackDefenseRunner.Hubs;
 using AttackDefenseRunner.Model;
 using AttackDefenseRunner.Util;
 using Microsoft.AspNetCore.Builder;
@@ -60,7 +61,7 @@ namespace AttackDefenseRunner
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                endpoints.MapHub<MonitorHub>("/monitor")
+                endpoints.MapHub<MonitorHub>("/monitor");
             });
         }
     }
