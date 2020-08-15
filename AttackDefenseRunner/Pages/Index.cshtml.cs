@@ -7,21 +7,21 @@ namespace AttackDefenseRunner.Pages
 {
     public class IndexModel : PageModel
     {
-        private RunningSingleton _running { get; }
+        private readonly ServiceManager _manager;
 
-        public IndexModel(RunningSingleton running)
+        public IndexModel(ServiceManager manager)
         {
-            _running = running;
+            _manager = manager;
         }
 
         public void OnPostStartService()
         {
-            _running.startService();
+            _manager.StartService();
         }
         
         public void OnPostStopService()
         {
-            _running.stopService();
+            _manager.StopService();
         }
     }
 }

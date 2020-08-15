@@ -13,33 +13,51 @@
     <form method="post">
         <div class="form-group">
             <label for="FlagRegex">Flag regex:</label>
-            <input id="FlagRegex" type="text" class="form-control" name="FlagRegex" value="@(_settings.GetValue(SettingsHelper.FLAG_REGEX_KEY))" asp-for="FlagRegex"/>
+            <input id="@(SettingsHelper.FLAG_REGEX_KEY)" type="text" class="form-control" name="FlagRegex" value="@(_settings.GetValue(SettingsHelper.FLAG_REGEX_KEY))" asp-for="FlagRegex"/>
         </div>
         <div class="form-group">
             <label for="VulnServers">Vulnerable servers:</label>
-            <input id="VulnServers" type="text" class="form-control" name="VulnServers" value="@(_settings.GetValue(SettingsHelper.VULNSERVERS_KEY))" asp-for="VulnServers"/>
+            <input id="@(SettingsHelper.VULNSERVERS_KEY)" type="text" class="form-control" name="VulnServers" value="@(_settings.GetValue(SettingsHelper.VULNSERVERS_KEY))" asp-for="VulnServers"/>
         </div>
         <div class="form-group">
             <label for="AttackServers">Attacking servers:</label>
-            <input id="AttackServers" type="text" class="form-control" name="AttackServers" value="@(_settings.GetValue(SettingsHelper.ATTACKSERVERS_KEY))" asp-for="AttackServers"/>
+            <input id="@(SettingsHelper.ATTACKSERVERS_KEY)" type="text" class="form-control" name="AttackServers" value="@(_settings.GetValue(SettingsHelper.ATTACKSERVERS_KEY))" asp-for="AttackServers"/>
         </div>
         <button type="submit" class="btn btn-primary" asp-page-handler="Config">Submit</button>
     </form>
 </div>
 <hr/>
-<div class="container pt-3">
+<div id="startstop" class="container pt-3">
     @if (_running.Running)
     {
-        <form method="POST">
-            <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopService">Stop Service</button>
-        </form>
-        <small class="form-text text-muted">Service currently running</small>
+        <div id="stopservice">
+            <form method="POST">
+                <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopService">Stop Service</button>
+            </form>
+            <small class="form-text text-muted">Service currently running</small>
+        </div>
+        
+        <div id="startservice" hidden>
+            <form method="POST">
+                <button type="submit" class="btn btn-success btn-lg" asp-page-handler="StartService">Start Service</button>
+            </form>
+            <small class="form-text text-muted">Service currently not running</small>
+        </div>
     }
     else
     {
-        <form method="POST">
-            <button type="submit" class="btn btn-success btn-lg" asp-page-handler="StartService">Start Service</button>
-        </form>
-        <small class="form-text text-muted">Service currently not running</small>
+        <div id="stopservice" hidden>
+            <form method="POST">
+                <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopService">Stop Service</button>
+            </form>
+            <small class="form-text text-muted">Service currently running</small>
+        </div>
+                
+        <div id="startservice">
+            <form method="POST">
+                <button type="submit" class="btn btn-success btn-lg" asp-page-handler="StartService">Start Service</button>
+            </form>
+            <small class="form-text text-muted">Service currently not running</small>
+        </div>
     }
 </div>

@@ -1,6 +1,8 @@
 using System;
 using System.Linq;
+using AttackDefenseRunner.Hubs;
 using AttackDefenseRunner.Model;
+using Microsoft.AspNetCore.SignalR;
 using Serilog;
 
 namespace AttackDefenseRunner.Util
@@ -10,12 +12,14 @@ namespace AttackDefenseRunner.Util
         public const string FLAG_REGEX_KEY = "FLAG_REGEX";
         public const string VULNSERVERS_KEY = "VULNSERVERS";
         public const string ATTACKSERVERS_KEY = "ATTACKSERVERS";
-        
-        private ADRContext _context { get; }
 
-        public SettingsHelper(ADRContext context)
+        private readonly ADRContext _context;
+        private readonly IHubContext<MonitorHub> _monitor;
+
+        public SettingsHelper(ADRContext context, IHubContext<MonitorHub> monitor)
         {
             _context = context;
+            _monitor = monitor;
         }
 
         public void SetValue(string key, string value)
@@ -40,6 +44,9 @@ namespace AttackDefenseRunner.Util
             }
 
             _context.SaveChanges();
+            
+            //Send to all clients
+            _monitor.Clients.All.SendAsync("ConfigUpdate", key, value);
         }
 
         public string GetValue(string key)

@@ -29,7 +29,9 @@ namespace AttackDefenseRunner
             
             // Scoped
             services.AddScoped<SettingsHelper>();
-
+            services.AddScoped<MonitorHub>();
+            services.AddScoped<ServiceManager>();
+            
             // Singletons
             services.AddSingleton<RunningSingleton>();
 
