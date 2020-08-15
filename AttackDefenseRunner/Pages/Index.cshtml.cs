@@ -16,14 +16,12 @@ namespace AttackDefenseRunner.Pages
 
         public void OnPostStartService()
         {
-            Log.Information("Started Service");
-            _running.Running = true;
+            _running.startService();
         }
         
         public void OnPostStopService()
         {
-            Log.Information("Stopped Service");
-            _running.Running = false;
+            _running.stopService();
         }
     }
 }

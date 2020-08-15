@@ -5,6 +5,7 @@
     ViewData["Title"] = "Configuration";
 }
 @inject SettingsHelper _settings
+@inject RunningSingleton _running
 
 <h1 class="display-4">Config</h1>
 <div class="container pt-3">
@@ -22,6 +23,23 @@
             <label for="AttackServers">Attacking servers:</label>
             <input id="AttackServers" type="text" class="form-control" name="AttackServers" value="@(_settings.GetValue(SettingsHelper.ATTACKSERVERS_KEY))" asp-for="AttackServers"/>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary" asp-page-handler="Config">Submit</button>
     </form>
+</div>
+<hr/>
+<div class="container pt-3">
+    @if (_running.Running)
+    {
+        <form method="POST">
+            <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopService">Stop Service</button>
+        </form>
+        <small class="form-text text-muted">Service currently running</small>
+    }
+    else
+    {
+        <form method="POST">
+            <button type="submit" class="btn btn-success btn-lg" asp-page-handler="StartService">Start Service</button>
+        </form>
+        <small class="form-text text-muted">Service currently not running</small>
+    }
 </div>
