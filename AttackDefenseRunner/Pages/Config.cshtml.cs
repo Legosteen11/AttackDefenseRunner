@@ -7,15 +7,15 @@ namespace AttackDefenseRunner.Pages
 {
     public class ConfigModel : PageModel
     {
-        private SettingsHelper _settings { get; }
-        private RunningSingleton _running { get; }
+        private readonly SettingsHelper _settings;
+        private readonly ServiceManager _manager;
 
-        public ConfigModel(SettingsHelper settings, RunningSingleton running)
+        public ConfigModel(SettingsHelper settings, ServiceManager manager)
         {
             _settings = settings;
-            _running = running;
+            _manager = manager;
         }
-        
+
 
         [BindProperty]
         public string FlagRegex { get; set; }
@@ -45,12 +45,12 @@ namespace AttackDefenseRunner.Pages
         
         public void OnPostStartService()
         {
-            _running.startService();
+            _manager.StartService();
         }
         
         public void OnPostStopService()
         {
-            _running.stopService();
+            _manager.StopService();
         }
     }
 }

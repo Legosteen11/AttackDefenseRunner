@@ -3,20 +3,31 @@
 
 var connection = new signalR.HubConnectionBuilder().withUrl("/monitor").build();
 
-connection.on("ReceiveInfo", function(key, value) {
-    document.getElementById("analytics").append("Received message from "+key+":"+value);
+connection.on("ServiceRunner", function(running) {
+    if (running) {
+        document.getElementById("startservice").hidden = true;
+        document.getElementById("stopservice").hidden = false;
+
+    } else {
+        document.getElementById("startservice").hidden = false;
+        document.getElementById("stopservice").hidden = true;
+    }
 });
 
+connection.on("ConfigUpdate", function(key, value) {
+    if (document.getElementById(key) != null) {
+        document.getElementById(key).value = value;
+    }
+});
+
+
 connection.start().then(function () {
-    document.getElementById("sendButton").disabled = false;
+    //Nothing yet
 }).catch(function (err) {
     return console.error(err.toString());
 });
 
 
-document.getElementById("socketbutton").addEventListener("click", function (event) {
-    connection.invoke("SendInfo", "someone", "clicked this button!!!").catch(function (err) {
-        return console.error(err.toString());
-    });
-    event.preventDefault();
-});
+// connection.invoke("SendInfo", "someone", "clicked this button!!!").catch(function (err) {
+//     return console.error(err.toString());
+// });

@@ -8,25 +8,42 @@
 
 <h1 class="display-4">Welcome</h1>
 
-<div class="container pt-3">
+<div id="startstop" class="container pt-3">
     @if (_running.Running)
     {
-        <form method="POST">
-            <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopService">Stop Service</button>
-        </form>
-        <small class="form-text text-muted">Service currently running</small>
+        <div id="stopservice">
+            <form method="POST">
+                <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopService">Stop Service</button>
+            </form>
+            <small class="form-text text-muted">Service currently running</small>
+        </div>
+        
+        <div id="startservice" hidden>
+            <form method="POST">
+                <button type="submit" class="btn btn-success btn-lg" asp-page-handler="StartService">Start Service</button>
+            </form>
+            <small class="form-text text-muted">Service currently not running</small>
+        </div>
     }
     else
     {
-        <form method="POST">
-            <button type="submit" class="btn btn-success btn-lg" asp-page-handler="StartService">Start Service</button>
-        </form>
-        <small class="form-text text-muted">Service currently not running</small>
+        <div id="stopservice" hidden>
+            <form method="POST">
+                <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopService">Stop Service</button>
+            </form>
+            <small class="form-text text-muted">Service currently running</small>
+        </div>
+                
+        <div id="startservice">
+            <form method="POST">
+                <button type="submit" class="btn btn-success btn-lg" asp-page-handler="StartService">Start Service</button>
+            </form>
+            <small class="form-text text-muted">Service currently not running</small>
+        </div>
     }
 </div>
 <hr/>
 <div id="analytics" class="container pt-3">
-    <button id="socketbutton" type="button" class="btn btn-primary" >Send socket message?</button>
     Analytics here
 </div>
 
