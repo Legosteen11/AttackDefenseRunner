@@ -3,6 +3,7 @@ using AttackDefenseRunner.Model;
 using AttackDefenseRunner.Util;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,7 +26,8 @@ namespace AttackDefenseRunner
             services.AddRazorPages();
 
             // Db Contexts
-            services.AddDbContext<ADRContext>();
+            services.AddDbContext<ADRContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("ADRContext")));
             
             // Scoped
             services.AddScoped<SettingsHelper>();
