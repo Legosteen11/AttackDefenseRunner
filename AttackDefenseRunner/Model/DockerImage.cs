@@ -5,6 +5,5 @@ namespace AttackDefenseRunner.Model
         public int Id { get; set; }
         
         public string Tag { get; set; }
-        public string Version { get; set; }
     }
 }

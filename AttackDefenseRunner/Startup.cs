@@ -31,6 +31,7 @@ namespace AttackDefenseRunner
             services.AddScoped<SettingsHelper>();
             services.AddScoped<MonitorHub>();
             services.AddScoped<ServiceManager>();
+            services.AddScoped<DockerTagHandler>();
             
             // Singletons
             services.AddSingleton<RunningSingleton>();
