@@ -4,8 +4,8 @@ namespace AttackDefenseRunner.Model
     {
         public int Id { get; set; }
         
-        public int DockerImageVersionId { get; set; }
+        public int DockerTagId { get; set; }
 
-        public DockerImageVersion DockerImageVersion { get; set; }
+        public DockerTag DockerTag { get; set; }
     }
 }
