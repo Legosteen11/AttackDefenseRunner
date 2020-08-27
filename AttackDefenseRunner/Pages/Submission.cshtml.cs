@@ -14,9 +14,7 @@ namespace AttackDefenseRunner.Pages
             _dockertags = dockertags;
         }
         
-        [BindProperty]
-        public string DockerName { get; set; }
-        
+
         [BindProperty]
         public string DockerTag { get; set; }
         
@@ -26,10 +24,9 @@ namespace AttackDefenseRunner.Pages
 
         public void OnPost()
         {
-            var dockername = DockerName;
             var dockertag = DockerTag;
 
-            _dockertags.AddDockerTag(dockername, dockertag);
+            _dockertags.AddDockerTag(dockertag);
 
         }
     }

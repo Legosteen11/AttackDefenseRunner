@@ -1,4 +1,6 @@
-﻿using AttackDefenseRunner.Model;
+﻿using System.Collections.Generic;
+using System.Linq;
+using AttackDefenseRunner.Model;
 using Serilog;
 
 
@@ -13,12 +15,16 @@ namespace AttackDefenseRunner.Util
             _context = context;
         }
 
-        public void AddDockerTag(string dockername, string dockertag)
+        public void AddDockerTag(string dockertag)
         {
-
             
-            Log.Information("Docker name is {dockername}", dockername);
             Log.Information("Docker tag is {dockertag}", dockertag);
         }
+
+        private List<DockerContainer> FetchTagsFromDatabase()
+        {
+            return _context.DockerContainers.ToList();
+        }
+        
     }
 }
