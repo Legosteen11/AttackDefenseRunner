@@ -21,12 +21,12 @@ namespace AttackDefenseRunner.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("DockerImageVersionId")
+                    b.Property<int>("DockerImageId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DockerImageVersionId");
+                    b.HasIndex("DockerImageId");
 
                     b.ToTable("DockerContainers");
                 });
@@ -40,28 +40,12 @@ namespace AttackDefenseRunner.Migrations
                     b.Property<string>("Tag")
                         .HasColumnType("TEXT");
 
-                    b.HasKey("Id");
-
-                    b.ToTable("DockerImages");
-                });
-
-            modelBuilder.Entity("AttackDefenseRunner.Model.DockerImageVersion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("DockerImageId")
-                        .HasColumnType("INTEGER");
-
                     b.Property<string>("Version")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DockerImageId");
-
-                    b.ToTable("DockerImageVersion");
+                    b.ToTable("DockerImages");
                 });
 
             modelBuilder.Entity("AttackDefenseRunner.Model.GlobalSetting", b =>
@@ -78,15 +62,6 @@ namespace AttackDefenseRunner.Migrations
                 });
 
             modelBuilder.Entity("AttackDefenseRunner.Model.DockerContainer", b =>
-                {
-                    b.HasOne("AttackDefenseRunner.Model.DockerImageVersion", "DockerImageVersion")
-                        .WithMany()
-                        .HasForeignKey("DockerImageVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("AttackDefenseRunner.Model.DockerImageVersion", b =>
                 {
                     b.HasOne("AttackDefenseRunner.Model.DockerImage", "DockerImage")
                         .WithMany()
