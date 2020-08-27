@@ -2,14 +2,16 @@
 using AttackDefenseRunner.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AttackDefenseRunner.Migrations
 {
     [DbContext(typeof(ADRContext))]
-    partial class ADRContextModelSnapshot : ModelSnapshot
+    [Migration("20200827205147_AddDockerImageVersion")]
+    partial class AddDockerImageVersion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
