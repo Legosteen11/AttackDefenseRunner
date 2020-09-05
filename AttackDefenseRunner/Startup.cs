@@ -1,5 +1,9 @@
+using AttackDefenseRunner.Hubs;
+using AttackDefenseRunner.Model;
+using AttackDefenseRunner.Util;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -18,7 +22,24 @@ namespace AttackDefenseRunner
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // General
             services.AddRazorPages();
+
+            // Db Contexts
+            services.AddDbContext<ADRContext>(options =>
+                options.UseNpgsql(Configuration.GetConnectionString("ADRContext")));
+            
+            // Scoped
+            services.AddScoped<SettingsHelper>();
+            services.AddScoped<MonitorHub>();
+            services.AddScoped<ServiceManager>();
+            services.AddScoped<DockerTagHandler>();
+            
+            // Singletons
+            services.AddSingleton<RunningSingleton>();
+
+            // SignalR
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,7 +63,11 @@ namespace AttackDefenseRunner
 
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapRazorPages(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapRazorPages();
+                endpoints.MapHub<MonitorHub>("/monitor");
+            });
         }
     }
 }

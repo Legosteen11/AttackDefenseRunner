@@ -1,4 +1,7 @@
+using AttackDefenseRunner.Model;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -16,8 +19,16 @@ namespace AttackDefenseRunner
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .CreateLogger();
-            
-            CreateHostBuilder(args).Build().Run();
+
+            var host = CreateHostBuilder(args).Build();
+
+            using (var scope = host.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<ADRContext>();
+                db.Database.Migrate();
+            }
+
+            host.Run();
             
             Log.CloseAndFlush();
         }
