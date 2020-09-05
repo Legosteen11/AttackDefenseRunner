@@ -1,4 +1,5 @@
-﻿using AttackDefenseRunner.Util;
+﻿using System.Threading.Tasks;
+using AttackDefenseRunner.Util;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Serilog;
@@ -22,11 +23,11 @@ namespace AttackDefenseRunner.Pages
         {
         }
 
-        public void OnPost()
+        public async Task OnPost()
         {
             var dockertag = DockerTag;
 
-            _dockertags.AddDockerTag(dockertag);
+            await _dockertags.AddDockerTag(dockertag);
 
         }
     }

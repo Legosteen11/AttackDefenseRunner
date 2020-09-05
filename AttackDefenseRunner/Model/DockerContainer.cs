@@ -1,3 +1,6 @@
+using System;
+using System.ComponentModel.DataAnnotations;
+
 namespace AttackDefenseRunner.Model
 {
     public class DockerContainer
@@ -5,7 +8,9 @@ namespace AttackDefenseRunner.Model
         public int Id { get; set; }
         
         public int DockerTagId { get; set; }
-
+        
+        public DateTime Timestamp { get; set; }
+        
         public DockerTag DockerTag { get; set; }
     }
 }
