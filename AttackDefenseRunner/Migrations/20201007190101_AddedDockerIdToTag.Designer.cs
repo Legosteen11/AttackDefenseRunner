@@ -3,15 +3,17 @@ using System;
 using AttackDefenseRunner.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace AttackDefenseRunner.Migrations
 {
     [DbContext(typeof(ADRContext))]
-    partial class ADRContextModelSnapshot : ModelSnapshot
+    [Migration("20201007190101_AddedDockerIdToTag")]
+    partial class AddedDockerIdToTag
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

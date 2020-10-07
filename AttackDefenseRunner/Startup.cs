@@ -1,6 +1,7 @@
 using AttackDefenseRunner.Hubs;
 using AttackDefenseRunner.Model;
 using AttackDefenseRunner.Util;
+using AttackDefenseRunner.Util.Docker;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -33,7 +34,8 @@ namespace AttackDefenseRunner
             services.AddScoped<SettingsHelper>();
             services.AddScoped<MonitorHub>();
             services.AddScoped<ServiceManager>();
-            services.AddScoped<DockerTagHandler>();
+            services.AddScoped<DockerTagManager>();
+            services.AddScoped<IDockerImageManager, LocalDockerImageManager>();
             
             // Singletons
             services.AddSingleton<RunningSingleton>();
