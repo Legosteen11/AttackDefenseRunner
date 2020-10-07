@@ -1,7 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using AttackDefenseRunner.Model;
+using AttackDefenseRunner.Util.Docker;
 using Docker.DotNet;
 using Docker.DotNet.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
 namespace AttackDefenseRunner.Util.Flag
@@ -10,34 +15,54 @@ namespace AttackDefenseRunner.Util.Flag
     {
         private readonly DockerClient _dockerClient;
         private readonly IFlagSubmitter _flagSubmitter;
+        private readonly IServiceProvider _serviceProvider;
 
-        public DockerFlagFinder(IFlagSubmitter flagSubmitter)
+        private List<MultiplexedStream> streams = new List<MultiplexedStream>();
+
+        public DockerFlagFinder(IFlagSubmitter flagSubmitter, IServiceProvider serviceProvider)
         {
             _flagSubmitter = flagSubmitter;
+            _serviceProvider = serviceProvider;
             _dockerClient = new DockerClientConfiguration()
                 .CreateClient();
         }
 
         public async Task Start(IFlagFinder.FlagDelegate finder, CancellationToken cancellationToken)
         {
-            var stream = await _dockerClient.Containers.GetContainerLogsAsync("cdb7eedc7a2b", true, new ContainerLogsParameters
+            ICollection<DockerContainer> dockerContainers;
+            
+            // TODO: We should automatically update this
+            using (var scope = _serviceProvider.CreateScope())
             {
-                ShowStderr = true,
-                ShowStdout = true
-            }, cancellationToken);
+                DockerTagManager tagManager = scope.ServiceProvider.GetRequiredService<DockerTagManager>();
+
+                dockerContainers = await tagManager.GetContainers();
+            }
+
+            foreach (var container in dockerContainers)
+            {
+                streams.Add(await _dockerClient.Containers.GetContainerLogsAsync(container.DockerId, true, new ContainerLogsParameters
+                {
+                    ShowStderr = true,
+                    ShowStdout = true
+                }, cancellationToken));
+            }
 
             while (!cancellationToken.IsCancellationRequested)
             {
                 Thread.Sleep(5000);
 
-                var output = await stream.ReadOutputToEndAsync(CancellationToken.None);
-
-                foreach (var flag in finder(output.stdout))
+                foreach (var stream in streams)
                 {
-                    _flagSubmitter.Submit(flag);
-                }
+                    var output = await stream.ReadOutputToEndAsync(CancellationToken.None);
+
+                    foreach (var flag in finder(output.stdout))
+                    {
+                        _flagSubmitter.Submit(flag);
+                    }
                 
-                Log.Information("Output: {@output}", output);
+                    Log.Information("Output: {@output}", output);
+                }
             }
         }
     }
