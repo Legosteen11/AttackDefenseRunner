@@ -2,6 +2,7 @@ using AttackDefenseRunner.Hubs;
 using AttackDefenseRunner.Model;
 using AttackDefenseRunner.Util;
 using AttackDefenseRunner.Util.Docker;
+using AttackDefenseRunner.Util.Flag;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -23,9 +24,6 @@ namespace AttackDefenseRunner
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // General
-            services.AddRazorPages();
-
             // Db Contexts
             services.AddDbContext<ADRContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("ADRContext")));
@@ -39,9 +37,14 @@ namespace AttackDefenseRunner
             
             // Singletons
             services.AddSingleton<RunningSingleton>();
-
+            services.AddTransient<IFlagFinder, DockerFlagFinder>();
+            services.AddTransient<IFlagSubmitter, LogFlagSubmitter>();
+            
             // SignalR
             services.AddSignalR();
+            
+            // Worker Services
+            services.AddRazorPages();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
