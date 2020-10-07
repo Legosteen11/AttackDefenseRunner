@@ -11,10 +11,7 @@ namespace AttackDefenseRunner.Util
 
         public static string GetImage(string tag)
         {
-            if (!IsValid(tag))
-                throw new ArgumentException("Invalid Tag pattern");
-
-            return tag.Split(":")[0];
+            return !IsValid(tag) ? tag : tag.Split(":")[0];
         }
         
         public static string GetVersion(string tag)
@@ -26,7 +23,7 @@ namespace AttackDefenseRunner.Util
         }
 
         public static string CreateName(string tag, int imageId)
-            => imageId + tag;
+            => imageId + GetImage(tag) + GetVersion(tag);
 
         public static string CreateImageOnlyName(string tag, int imageId)
             => imageId + GetImage(tag);

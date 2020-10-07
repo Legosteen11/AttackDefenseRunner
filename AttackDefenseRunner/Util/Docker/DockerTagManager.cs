@@ -15,14 +15,14 @@ namespace AttackDefenseRunner.Util.Docker
         }
         
         public async Task<DockerImage> GetImage(string tagString)
-            => await _context.DockerImages.Where(dockerImage => dockerImage.Name == TagHelper.GetImage(tagString)).FirstAsync();
+            => await _context.DockerImages.Where(dockerImage => dockerImage.Name == TagHelper.GetImage(tagString)).FirstOrDefaultAsync();
 
         public async Task<DockerImage> GetOrCreateImage(string tagString)
         {
             string imageString = TagHelper.GetImage(tagString);
 
             // First check if the image exists in the database
-            DockerImage image = await _context.DockerImages.Where(dockerImage => dockerImage.Name == imageString).FirstAsync();
+            DockerImage image = await _context.DockerImages.Where(dockerImage => dockerImage.Name == imageString).FirstOrDefaultAsync();
 
             if (image != null) return image;
             
@@ -43,7 +43,7 @@ namespace AttackDefenseRunner.Util.Docker
             string versionString = TagHelper.GetVersion(tagString);
 
             DockerTag tag = await _context.DockerTags
-                .Where(dockerTag => dockerTag.Tag == tagString).FirstAsync();
+                .Where(dockerTag => dockerTag.Tag == tagString).FirstOrDefaultAsync();
 
             if (tag != null) return tag;
             

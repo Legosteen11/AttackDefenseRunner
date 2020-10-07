@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AttackDefenseRunner.Migrations
 {
     [DbContext(typeof(ADRContext))]
-    [Migration("20201007190101_AddedDockerIdToTag")]
-    partial class AddedDockerIdToTag
+    [Migration("20201007191119_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

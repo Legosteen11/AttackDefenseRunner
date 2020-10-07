@@ -30,6 +30,7 @@ namespace AttackDefenseRunner.Util.Docker
             string containerName = TagHelper.CreateName(tag.Tag, tag.DockerImageId);
             
             // Start tag
+            // First create the image:
             var container = await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters
             {
                 Image = tag.Tag,
@@ -53,7 +54,15 @@ namespace AttackDefenseRunner.Util.Docker
         public async Task StopContainer(string id)
         {
             await _dockerClient.Containers.StopContainerAsync(id, new ContainerStopParameters());
-            
+            try
+            {
+                await _dockerClient.Containers.RemoveContainerAsync(id, new ContainerRemoveParameters());
+            }
+            catch (Exception)
+            {
+                // Ignore exception
+            }
+
             // Remove any containers from the database with this id
             _context.RemoveRange(await _context.DockerContainers.Where(dockerContainer => dockerContainer.DockerId == id).ToListAsync());
             await _context.SaveChangesAsync();
@@ -65,7 +74,7 @@ namespace AttackDefenseRunner.Util.Docker
             DockerTag tag = await _tagManager.GetOrCreateTag(tagString);
 
             // Check if there are any running instances of this image
-            var runningIds = await GetContainers(TagHelper.CreateImageOnlyName(tagString, tag.DockerImageId));
+            var runningIds = await GetContainers(TagHelper.GetImage(tagString), TagHelper.CreateImageOnlyName(tagString, tag.DockerImageId));
 
             bool alreadyRunning = false;
             
@@ -93,7 +102,7 @@ namespace AttackDefenseRunner.Util.Docker
             if (image == null)
                 throw new ImageNotFoundException(tagString);
 
-            var runningIds = await GetContainers(TagHelper.CreateImageOnlyName(tagString, image.Id));
+            var runningIds = await GetContainers(TagHelper.GetImage(tagString), TagHelper.CreateImageOnlyName(tagString, image.Id));
 
             string imageString = TagHelper.GetImage(tagString);
             
@@ -108,13 +117,13 @@ namespace AttackDefenseRunner.Util.Docker
             }
         }
 
-        private async Task<ICollection<ContainerListResponse>> GetContainers(string imageString)
-            => await _dockerClient.Containers.ListContainersAsync(new ContainersListParameters
+        private async Task<ICollection<ContainerListResponse>> GetContainers(string imageString, string nameString)
+            => (await _dockerClient.Containers.ListContainersAsync(new ContainersListParameters
             {
                 Filters = new Dictionary<string, IDictionary<string, bool>>
                 {
-                    {"label", new Dictionary<string, bool> {{imageString, true}}}
+                    // {"label", new Dictionary<string, bool> {{imageString, true}}}
                 }
-            });
+            })).Where(container => TagHelper.GetImage(container.Image) == imageString).ToList();
     }
 }
