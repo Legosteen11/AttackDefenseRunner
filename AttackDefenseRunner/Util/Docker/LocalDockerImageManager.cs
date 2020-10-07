@@ -30,6 +30,9 @@ namespace AttackDefenseRunner.Util.Docker
             string containerName = TagHelper.CreateName(tag.Tag, tag.DockerImageId);
             
             // Start tag
+            // Pull the image
+            $"docker pull {tag.Tag}".Bash();
+            
             // First create the image:
             var container = await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters
             {
@@ -123,7 +126,8 @@ namespace AttackDefenseRunner.Util.Docker
                 Filters = new Dictionary<string, IDictionary<string, bool>>
                 {
                     // {"label", new Dictionary<string, bool> {{imageString, true}}}
-                }
+                },
+                All = true
             })).Where(container => TagHelper.GetImage(container.Image) == imageString).ToList();
     }
 }
