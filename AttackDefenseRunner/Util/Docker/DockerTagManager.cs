@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AttackDefenseRunner.Model;
@@ -62,5 +63,8 @@ namespace AttackDefenseRunner.Util.Docker
 
             return tag;
         }
+
+        public async Task<ICollection<DockerContainer>> GetContainers()
+            => await _context.DockerContainers.Include(container => container.DockerTag).ToListAsync();
     }
 }

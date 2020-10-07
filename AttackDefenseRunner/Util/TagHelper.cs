@@ -23,9 +23,9 @@ namespace AttackDefenseRunner.Util
         }
 
         public static string CreateName(string tag, int imageId)
-            => imageId + GetImage(tag) + GetVersion(tag);
+            => imageId + "adr" + GetVersion(tag);
 
         public static string CreateImageOnlyName(string tag, int imageId)
-            => imageId + GetImage(tag);
+            => imageId + "adr";
     }
 }

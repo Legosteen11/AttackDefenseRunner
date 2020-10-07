@@ -1,8 +1,10 @@
 ﻿@page
+@using AttackDefenseRunner.Util.Docker
 @model SubmissionModel
 @{
     ViewData["Title"] = "Home page";
 }
+@inject DockerTagManager _tagManager;
 
 <h1 class="display-4">Submission</h1>
 <div class="container pt-3">
@@ -17,3 +19,19 @@
     </form>
 </div> 
 
+<h2>Current tags running</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Container</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    @foreach (var container in await _tagManager.GetContainers())
+    {
+        <tr>
+            <th>@(container.DockerTag.Tag)</th>
+            <th>Actions are not available yet</th>
+        </tr>
+    }
+</table>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AttackDefenseRunner.Model;
 using Docker.DotNet;
@@ -31,6 +32,7 @@ namespace AttackDefenseRunner.Util.Docker
             
             // Start tag
             // Pull the image
+            // TODO: Fix this with some API call because this is not secure :-).
             $"docker pull {tag.Tag}".Bash();
             
             // First create the image:
