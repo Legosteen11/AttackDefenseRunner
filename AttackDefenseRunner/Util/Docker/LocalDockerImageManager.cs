@@ -34,6 +34,7 @@ namespace AttackDefenseRunner.Util.Docker
             
             // Start tag
             // Pull the image
+            Log.Information("Pulling image {image}", tag.Tag);
             // TODO: Fix this with some API call because this is not secure :-).
             $"docker pull {tag.Tag}".Bash();
             
@@ -41,8 +42,17 @@ namespace AttackDefenseRunner.Util.Docker
             var container = await _dockerClient.Containers.CreateContainerAsync(new CreateContainerParameters
             {
                 Image = tag.Tag,
-                Name = containerName
+                Name = containerName,
+                HostConfig = new HostConfig
+                {
+                    RestartPolicy = new RestartPolicy
+                    {
+                        Name = RestartPolicyKind.Always
+                    }
+                }
             });
+
+            await _dockerClient.Containers.StartContainerAsync(container.ID, new ContainerStartParameters());
             
             Log.Information("Started container {name}, {id} for {tag}", containerName, container.ID, tag.Tag);
             

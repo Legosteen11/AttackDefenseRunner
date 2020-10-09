@@ -6,6 +6,9 @@ namespace AttackDefenseRunner.Util.Flag
     {
         public void Submit(string flag)
         {
+            if (flag == "") 
+                return;
+            
             Log.Information("Found flag: {flag}", flag);
         }
     }

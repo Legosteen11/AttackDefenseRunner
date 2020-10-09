@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AttackDefenseRunner.Model;
@@ -21,14 +23,15 @@ namespace AttackDefenseRunner.Util.Flag
         private bool _streamUpdate;
         private readonly SemaphoreSlim _streamLock = new SemaphoreSlim(1, 1);
 
-        private Dictionary<DockerContainer, MultiplexedStream> streams = new Dictionary<DockerContainer, MultiplexedStream>();
+        private Dictionary<DockerContainer, DateTimeOffset> streams = new Dictionary<DockerContainer, DateTimeOffset>();
 
-        public DockerFlagFinder(IFlagSubmitter flagSubmitter, IServiceProvider serviceProvider)
+        public DockerFlagFinder(IFlagSubmitter flagSubmitter, IServiceProvider serviceProvider, IDockerContainerObserver containerObserver)
         {
             _flagSubmitter = flagSubmitter;
             _serviceProvider = serviceProvider;
             _dockerClient = new DockerClientConfiguration()
                 .CreateClient();
+            containerObserver.Subscribe(this);
         }
 
         public async Task Start(IFlagFinder.FlagDelegate finder, CancellationToken cancellationToken)
@@ -54,20 +57,35 @@ namespace AttackDefenseRunner.Util.Flag
                 // Request lock
                 await _streamLock.WaitAsync(cancellationToken);
                 
-                foreach (var stream in streams.Values)
+                // We have to convert this to an immutable list because else the runtime will complain about changed
+                // dictionaries while enumerating
+                foreach (var container in streams.Keys.ToImmutableList())
                 {
                     // Check if streams haven't just been updated
-                    if (_streamUpdate)
+                    if (_streamUpdate || cancellationToken.IsCancellationRequested)
                         break;
+                    
+                    var streamStop = DateTimeOffset.Now;
+                    var streamStart = streams[container];
+
+                    var stream = await GetStream(container, streamStart, streamStop);
                     
                     var output = await stream.ReadOutputToEndAsync(CancellationToken.None);
 
-                    foreach (var flag in finder(output.stdout))
+                    stream.Dispose();
+                    
+                    // Update streams time
+                    streams[container] = streamStop;
+
+                    // Replace some weird output from Docker logs
+                    var lines = output.stdout.Replace("\u0001\u0000\u0000\u0000\u0000\u0000\u0000*", "").Split("\n");
+
+                    foreach (var flag in lines.SelectMany(line => finder(line)))
                     {
                         _flagSubmitter.Submit(flag);
                     }
                 
-                    Log.Information("Output: {@output}", output);
+                    Log.Information("Output of {container}: {@output}", container.DockerId, lines);
                 }
 
                 // Release lock
@@ -75,11 +93,12 @@ namespace AttackDefenseRunner.Util.Flag
             }
         }
 
-        private async Task<MultiplexedStream> GetStream(DockerContainer container)
+        private async Task<MultiplexedStream> GetStream(DockerContainer container, DateTimeOffset from, DateTimeOffset until)
             => await _dockerClient.Containers.GetContainerLogsAsync(container.DockerId, true, new ContainerLogsParameters
             {
                 ShowStderr = true,
-                ShowStdout = true
+                ShowStdout = true,
+                Since = from.ToUnixTimeSeconds().ToString()
             }, _cancellationToken);
 
         private async Task UpdateStreams(ICollection<DockerContainer> containers)
@@ -96,18 +115,17 @@ namespace AttackDefenseRunner.Util.Flag
                 if (!streams.ContainsKey(container))
                 {
                     Log.Information("Listening to new container {containerId}", container.DockerId);
-                    streams.Add(container, await GetStream(container));
+                    streams.Add(container, DateTimeOffset.Now);
                 }
             }
             
             // Remove streams of removed containers
-            foreach (var (container, stream) in streams)
+            foreach (var (container, _) in streams)
             {
                 if (containers.Contains(container)) continue;
 
                 // Stream should be removed
                 Log.Information("Removing stream to container {containerId}", container.DockerId);
-                stream.Dispose();
                 streams.Remove(container);
             }
 
