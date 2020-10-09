@@ -37,8 +37,9 @@ namespace AttackDefenseRunner
             
             // Singletons
             services.AddSingleton<RunningSingleton>();
-            services.AddTransient<IFlagFinder, DockerFlagFinder>();
-            services.AddTransient<IFlagSubmitter, LogFlagSubmitter>();
+            services.AddSingleton<IFlagFinder, DockerFlagFinder>();
+            services.AddSingleton<IFlagSubmitter, LogFlagSubmitter>();
+            services.AddSingleton<IDockerContainerObserver, SimpleDockerContainerObserver>();
             
             // SignalR
             services.AddSignalR();

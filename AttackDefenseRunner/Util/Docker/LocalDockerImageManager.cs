@@ -1,13 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using AttackDefenseRunner.Model;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using ContainerList = System.Collections.Generic.List<AttackDefenseRunner.Model.DockerContainer>;
 
 namespace AttackDefenseRunner.Util.Docker
 {
@@ -16,11 +16,13 @@ namespace AttackDefenseRunner.Util.Docker
         private readonly ADRContext _context;
         private readonly DockerTagManager _tagManager;
         private readonly DockerClient _dockerClient;
+        private readonly List<IObserver<List<DockerContainer>>> _observers = new List<IObserver<ContainerList>>();
 
-        public LocalDockerImageManager(ADRContext context, DockerTagManager tagManager)
+        public LocalDockerImageManager(ADRContext context, DockerTagManager tagManager, IDockerContainerObserver containerObserver)
         {
             _context = context;
             _tagManager = tagManager;
+            containerObserver.Subscribe(this);
             // TODO: Create something nicer for this so we can add settings etc.
             _dockerClient = new DockerClientConfiguration()
                 .CreateClient();
@@ -53,6 +55,8 @@ namespace AttackDefenseRunner.Util.Docker
             await _context.AddAsync(dockerContainer);
             await _context.SaveChangesAsync();
 
+            await Notify();
+
             return dockerContainer;
         }
 
@@ -71,6 +75,8 @@ namespace AttackDefenseRunner.Util.Docker
             // Remove any containers from the database with this id
             _context.RemoveRange(await _context.DockerContainers.Where(dockerContainer => dockerContainer.DockerId == id).ToListAsync());
             await _context.SaveChangesAsync();
+
+            await Notify();
         }
 
         public async Task UpdateImage(string tagString)
@@ -120,6 +126,8 @@ namespace AttackDefenseRunner.Util.Docker
                 Log.Information("Stopping container {id}", container.ID);
                 await StopContainer(container.ID);
             }
+
+            await Notify();
         }
 
         private async Task<ICollection<ContainerListResponse>> GetContainers(string imageString, string nameString)
@@ -131,5 +139,24 @@ namespace AttackDefenseRunner.Util.Docker
                 },
                 All = true
             })).Where(container => TagHelper.GetImage(container.Image) == imageString).ToList();
+
+        private async Task Notify()
+        {
+            var containerList = await _context.DockerContainers.ToListAsync(); 
+            
+            foreach (var observer in _observers)
+            {
+                observer.OnNext(containerList);
+            }
+        }
+        
+        public IDisposable Subscribe(IObserver<List<DockerContainer>> observer)
+        {
+            if (!_observers.Contains(observer))
+            {
+                _observers.Add(observer);
+            }
+            return new Unsubscriber(_observers, observer);
+        }
     }
 }
