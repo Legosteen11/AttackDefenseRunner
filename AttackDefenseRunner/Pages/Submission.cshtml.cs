@@ -1,4 +1,6 @@
-﻿using AttackDefenseRunner.Util;
+﻿using System.Threading.Tasks;
+using AttackDefenseRunner.Util;
+using AttackDefenseRunner.Util.Docker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Serilog;
@@ -7,11 +9,11 @@ namespace AttackDefenseRunner.Pages
 {
     public class SubmissionModel : PageModel
     {
-        private readonly DockerTagHandler _dockertags;
+        private readonly IDockerImageManager _dockerImageManager;
 
-        public SubmissionModel(DockerTagHandler dockertags)
+        public SubmissionModel(IDockerImageManager dockerImageManager)
         {
-            _dockertags = dockertags;
+            _dockerImageManager = dockerImageManager;
         }
         
 
@@ -22,12 +24,18 @@ namespace AttackDefenseRunner.Pages
         {
         }
 
-        public void OnPost()
+        public async Task OnPostAddDockerTag()
         {
-            var dockertag = DockerTag;
+            string tagString = DockerTag;
 
-            _dockertags.AddDockerTag(dockertag);
+            await _dockerImageManager.UpdateImage(tagString);
+        }
 
+        public async Task OnPostStopDockerTag()
+        {
+            string tagString = DockerTag;
+
+            await _dockerImageManager.StopContainer(tagString);
         }
     }
 }

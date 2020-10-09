@@ -1,8 +1,10 @@
 ﻿@page
+@using AttackDefenseRunner.Util.Docker
 @model SubmissionModel
 @{
     ViewData["Title"] = "Home page";
 }
+@inject DockerTagManager _tagManager;
 
 <h1 class="display-4">Submission</h1>
 <div class="container pt-3">
@@ -13,7 +15,28 @@
             <label for="DockerTag">Docker tag:</label>
             <input id="DockerTag" type="text" class="form-control" name="DockerTag" value="" asp-for="DockerTag"/>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary" asp-page-handler="AddDockerTag">Submit</button>
     </form>
 </div> 
 
+<h2>Current tags running</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Container</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    @foreach (var container in await _tagManager.GetContainers())
+    {
+        <tr>
+            <th>@(container.DockerTag.Tag)</th>
+            <th>       
+                <form method="POST">
+                    <input id="DockerTag" type="text" class="form-control" name="DockerTag" value="@(container.DockerId)" asp-for="DockerTag" hidden/>
+                    <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopDockerTag">Stop Docker Tag</button>
+                </form>
+            </th>
+        </tr>
+    }
+</table>

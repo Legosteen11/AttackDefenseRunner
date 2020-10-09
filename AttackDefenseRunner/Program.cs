@@ -1,4 +1,5 @@
 using AttackDefenseRunner.Model;
+using AttackDefenseRunner.Util.Flag;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,6 +37,8 @@ namespace AttackDefenseRunner
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
                 .UseSerilog()
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                .ConfigureServices(
+                    services => services.AddHostedService<FlagFinderWorker>());
     }
 }
