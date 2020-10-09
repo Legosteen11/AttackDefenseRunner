@@ -24,11 +24,18 @@ namespace AttackDefenseRunner.Pages
         {
         }
 
-        public async Task OnPost()
+        public async Task OnPostAddDockerTag()
         {
             string tagString = DockerTag;
 
             await _dockerImageManager.UpdateImage(tagString);
+        }
+
+        public async Task OnPostStopDockerTag()
+        {
+            string tagString = DockerTag;
+
+            await _dockerImageManager.StopContainer(tagString);
         }
     }
 }

@@ -15,7 +15,7 @@
             <label for="DockerTag">Docker tag:</label>
             <input id="DockerTag" type="text" class="form-control" name="DockerTag" value="" asp-for="DockerTag"/>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        <button type="submit" class="btn btn-primary" asp-page-handler="AddDockerTag">Submit</button>
     </form>
 </div> 
 
@@ -31,7 +31,12 @@
     {
         <tr>
             <th>@(container.DockerTag.Tag)</th>
-            <th>Actions are not available yet</th>
+            <th>       
+                <form method="POST">
+                    <input id="DockerTag" type="text" class="form-control" name="DockerTag" value="@(container.DockerId)" asp-for="DockerTag" hidden/>
+                    <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopDockerTag">Stop Docker Tag</button>
+                </form>
+            </th>
         </tr>
     }
 </table>
