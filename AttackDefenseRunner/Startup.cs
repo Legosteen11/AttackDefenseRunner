@@ -3,6 +3,7 @@ using AttackDefenseRunner.Model;
 using AttackDefenseRunner.Util;
 using AttackDefenseRunner.Util.Docker;
 using AttackDefenseRunner.Util.Flag;
+using AttackDefenseRunner.Util.Parsing;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -40,12 +41,14 @@ namespace AttackDefenseRunner
             services.AddSingleton<IFlagFinder, DockerFlagFinder>();
             services.AddSingleton<IFlagSubmitter, LogFlagSubmitter>();
             services.AddSingleton<IDockerContainerObserver, SimpleDockerContainerObserver>();
+            services.AddSingleton<DockerImageJsonParser>();
             
             // SignalR
             services.AddSignalR();
             
             // Worker Services
             services.AddRazorPages();
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -73,6 +76,7 @@ namespace AttackDefenseRunner
             {
                 endpoints.MapRazorPages();
                 endpoints.MapHub<MonitorHub>("/monitor");
+                endpoints.MapControllers();
             });
         }
     }
