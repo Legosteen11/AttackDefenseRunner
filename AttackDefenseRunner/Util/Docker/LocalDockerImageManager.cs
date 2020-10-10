@@ -89,7 +89,7 @@ namespace AttackDefenseRunner.Util.Docker
             await Notify();
         }
 
-        public async Task UpdateImage(string tagString)
+        public async Task<DockerContainer> UpdateImage(string tagString)
         {
             // Get or create the tag
             DockerTag tag = await _tagManager.GetOrCreateTag(tagString);
@@ -98,6 +98,7 @@ namespace AttackDefenseRunner.Util.Docker
             var runningIds = await GetContainers(TagHelper.GetImage(tagString), TagHelper.CreateImageOnlyName(tagString, tag.DockerImageId));
 
             bool alreadyRunning = false;
+            DockerContainer runningContainer = null;
             
             foreach (var container in runningIds)
             {
@@ -106,14 +107,22 @@ namespace AttackDefenseRunner.Util.Docker
                     Log.Information("Stopping container {id}", container.ID);
                     await StopContainer(container.ID);
                 }
-                else
+                else 
+                {
                     alreadyRunning = true;
+                    runningContainer = await _context
+                        .DockerContainers
+                        .Where(c => c.DockerId == container.ID)
+                        .FirstAsync();
+                }
             }
 
             if (!alreadyRunning)
             {
-                await StartContainer(tag);
+                runningContainer = await StartContainer(tag);
             }
+
+            return runningContainer;
         }
 
         public async Task StopImage(string tagString)

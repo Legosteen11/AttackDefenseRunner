@@ -12,7 +12,7 @@ namespace AttackDefenseRunner.Util.Docker
 
     public Task StopContainer(string id);
 
-    public Task UpdateImage(string tagString);
+    public Task<DockerContainer> UpdateImage(string tagString);
 
     public Task StopImage(string tag);
     }
