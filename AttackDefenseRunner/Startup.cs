@@ -25,6 +25,10 @@ namespace AttackDefenseRunner
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // Host
+            services.AddRazorPages();
+            services.AddControllers();
+            
             // Db Contexts
             services.AddDbContext<ADRContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("ADRContext")));
@@ -45,10 +49,6 @@ namespace AttackDefenseRunner
             
             // SignalR
             services.AddSignalR();
-            
-            // Worker Services
-            services.AddRazorPages();
-            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -75,8 +75,8 @@ namespace AttackDefenseRunner
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                endpoints.MapHub<MonitorHub>("/monitor");
                 endpoints.MapControllers();
+                endpoints.MapHub<MonitorHub>("/monitor");
             });
         }
     }

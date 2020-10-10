@@ -1,0 +1,11 @@
+namespace AttackDefenseRunner.Util
+{
+    public class Endpoint
+    {
+        public const string API_BASE = "/api";
+        public const string ID = "/{id}";
+        public const string CONTAINER_BASE = API_BASE + "/container";
+        public const string IMAGE_BASE = API_BASE + "/image";
+        public const string STOP = "/stop";
+    }
+}

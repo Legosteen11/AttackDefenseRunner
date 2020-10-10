@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AttackDefenseRunner.Model;
+using AttackDefenseRunner.Util;
 using AttackDefenseRunner.Util.Docker;
 using AttackDefenseRunner.Util.Parsing;
 using AttackDefenseRunner.Util.Parsing.Json;
@@ -10,7 +11,6 @@ using Serilog;
 
 namespace AttackDefenseRunner.Controllers
 {
-    [Route("api/image/[controller]")]
     [ApiController]
     public class DockerImageController : Controller
     {
@@ -25,11 +25,11 @@ namespace AttackDefenseRunner.Controllers
             _context = context;
         }
 
-        [HttpGet("container")]
+        [HttpGet(Endpoint.CONTAINER_BASE)]
         public async Task<List<DockerContainer>> GetContainers()
             => await _context.DockerContainers.ToListAsync();
 
-        [HttpPost("update")]
+        [HttpPost(Endpoint.IMAGE_BASE)]
         public async Task<DockerContainer> UpdateImage()
         {
             DockerTagJson dockerTagJson;
@@ -45,6 +45,12 @@ namespace AttackDefenseRunner.Controllers
             }
             
             return await _imageManager.UpdateImage(dockerTagJson.Tag);
+        }
+
+        [HttpPost(Endpoint.IMAGE_BASE + Endpoint.ID + Endpoint.STOP)]
+        public async Task StopImage(string id)
+        {
+            await _imageManager.StopContainer(id);
         }
     }
 }
