@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using AttackDefenseRunner.Model;
+using AttackDefenseRunner.Util.Parsing.Json;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using Microsoft.EntityFrameworkCore;
@@ -147,6 +149,70 @@ namespace AttackDefenseRunner.Util.Docker
             }
 
             await Notify();
+        }
+
+        public async Task<UsageJson> GetUsage()
+        {
+            // Output looks something like this:
+            //     total        used        free      shared  buff/cache   available
+            // Mem:          11673        6657         238         461        4778        4241
+            // Swap:          5903          31        5872
+            var memory = "free -m"
+                .Bash()
+                .Split("\n")[1]
+                .Split(" ", StringSplitOptions.RemoveEmptyEntries);
+
+            var totalMem = ulong.Parse(memory[1]);
+            var usedMem = ulong.Parse(memory[2]);
+            
+            UsageJson usage = new UsageJson
+            {
+                MemorySet = true,
+                MemoryTotalAvailable = totalMem,
+                MemoryUsage = usedMem,
+                MemoryLeft = totalMem - usedMem
+            };
+            
+            var testContainer = await _context.DockerContainers.FirstOrDefaultAsync();
+
+            if (testContainer == null)
+                return usage;
+
+            // Create a semaphore to make us wait for the container stats response to finish
+            SemaphoreSlim s = new SemaphoreSlim(0, 1);
+            
+            await _dockerClient
+                .Containers
+                .GetContainerStatsAsync(testContainer.DockerId, new ContainerStatsParameters
+                    {
+                        Stream = false
+                    },
+                    new Progress<ContainerStatsResponse>(r =>
+                    {
+                        var memory = r.MemoryStats;
+                        var cpu = r.CPUStats;
+                        var prevCpu = r.PreCPUStats;
+            
+                        var cpuDelta = cpu.CPUUsage.TotalUsage - prevCpu.CPUUsage.TotalUsage;
+                        var systemCpuDelta = cpu.SystemUsage - prevCpu.SystemUsage;
+                        var maxCpuUsage = cpu.OnlineCPUs * 100;
+                        var cpuUsage = (cpuDelta / systemCpuDelta) * maxCpuUsage;
+            
+                        var usedMemory = memory.Usage - memory.Stats["cache"];
+                        var maxMemory = memory.Limit;
+
+                        usage.CpuSet = true;
+                        usage.CpuUsage = cpuUsage;
+                        usage.CpuTotalAvailable = maxCpuUsage;
+                        usage.CpuLeft = maxCpuUsage - cpuUsage;
+
+                        s.Release();
+                    }));
+            
+            // Wait for the request to finish
+            await s.WaitAsync();
+            
+            return usage;
         }
 
         private async Task<ICollection<ContainerListResponse>> GetContainers(string imageString, string nameString)
