@@ -63,6 +63,12 @@ namespace AttackDefenseRunner.Controllers
         [HttpPost(Endpoint.IMAGE_BASE + Endpoint.ID + Endpoint.STOP)]
         public async Task StopImage(string id)
         {
+            await _imageManager.StopImage(id);
+        }
+        
+        [HttpPost(Endpoint.CONTAINER_BASE + Endpoint.ID + Endpoint.STOP)]
+        public async Task StopContainer(string id)
+        {
             await _imageManager.StopContainer(id);
         }
     }
