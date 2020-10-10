@@ -6,6 +6,7 @@ namespace AttackDefenseRunner.Util
         public const string ID = "/{id}";
         public const string CONTAINER_BASE = API_BASE + "/container";
         public const string IMAGE_BASE = API_BASE + "/image";
+        public const string UPDATE_IMAGE = IMAGE_BASE + "/update";
         public const string STOP = "/stop";
     }
 }

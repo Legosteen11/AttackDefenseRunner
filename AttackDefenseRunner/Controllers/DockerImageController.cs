@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AttackDefenseRunner.Model;
 using AttackDefenseRunner.Util;
@@ -27,9 +28,13 @@ namespace AttackDefenseRunner.Controllers
 
         [HttpGet(Endpoint.CONTAINER_BASE)]
         public async Task<List<DockerContainer>> GetContainers()
-            => await _context.DockerContainers.ToListAsync();
+            => await _context
+                .DockerContainers
+                .Include(c => c.DockerTag)
+                .ThenInclude(t => t.DockerImage)
+                .ToListAsync();
 
-        [HttpPost(Endpoint.IMAGE_BASE)]
+        [HttpPost(Endpoint.UPDATE_IMAGE)]
         public async Task<DockerContainer> UpdateImage()
         {
             DockerTagJson dockerTagJson;
@@ -44,7 +49,15 @@ namespace AttackDefenseRunner.Controllers
                 return null;
             }
             
-            return await _imageManager.UpdateImage(dockerTagJson.Tag);
+            var container = await _imageManager.UpdateImage(dockerTagJson.Tag);
+
+            // Fetch related Tag and Image as well
+            return await _context
+                .DockerContainers
+                .Include(c => c.DockerTag)
+                .ThenInclude(t => t.DockerImage)
+                .Where(c => c.Id == container.Id)
+                .FirstAsync();
         }
 
         [HttpPost(Endpoint.IMAGE_BASE + Endpoint.ID + Endpoint.STOP)]
