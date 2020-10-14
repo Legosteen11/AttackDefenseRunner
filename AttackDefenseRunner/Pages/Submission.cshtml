@@ -19,24 +19,26 @@
     </form>
 </div> 
 
-<h2>Current tags running</h2>
-<table>
-    <thead>
+<div class="container pt-3">
+    <h2>Current tags running</h2>
+    <table class="table">
+        <thead>
         <tr>
-            <th>Container</th>
-            <th>Actions</th>
+            <th scope="col">Container</th>
+            <th scope="col">Actions</th>
         </tr>
-    </thead>
-    @foreach (var container in await _tagManager.GetContainers())
-    {
-        <tr>
-            <th>@(container.DockerTag.Tag)</th>
-            <th>       
-                <form method="POST">
-                    <input id="DockerTag" type="text" class="form-control" name="DockerTag" value="@(container.DockerId)" asp-for="DockerTag" hidden/>
-                    <button type="submit" class="btn btn-danger btn-lg" asp-page-handler="StopDockerTag">Stop Docker Tag</button>
-                </form>
-            </th>
-        </tr>
-    }
-</table>
+        </thead>
+        @foreach (var container in await _tagManager.GetContainers())
+        {
+            <tr>
+                <td>@(container.DockerTag.Tag)</td>
+                <td>       
+                    <form method="POST">
+                        <input id="DockerTag" type="text" class="form-control" name="DockerTag" value="@(container.DockerId)" asp-for="DockerTag" hidden/>
+                        <button type="submit" class="btn btn-danger" asp-page-handler="StopDockerTag">Stop</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </table>
+</div>
