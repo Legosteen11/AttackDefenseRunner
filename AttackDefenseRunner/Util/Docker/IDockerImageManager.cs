@@ -17,5 +17,7 @@ namespace AttackDefenseRunner.Util.Docker
         public Task StopImage(string tag);
 
         public Task<UsageJson> GetUsage();
+
+        public Task UpdateTargets(ICollection<string> targets);
     }
 }

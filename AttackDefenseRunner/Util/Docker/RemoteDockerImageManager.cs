@@ -73,6 +73,11 @@ namespace AttackDefenseRunner.Util.Docker
             return totalUsage;
         }
 
+        public Task UpdateTargets(ICollection<string> targets)
+        {
+            throw new NotImplementedException();
+        }
+
         private async Task<Dictionary<RemoteWorker, UsageJson>> GetUsages()
         {
             var usages = new Dictionary<RemoteWorker, UsageJson>();
