@@ -17,7 +17,7 @@
         </div>
         <div class="form-group">
             <label for="VulnServers">Vulnerable servers:</label>
-            <input id="@(SettingsHelper.VULNSERVERS_KEY)" type="text" class="form-control" name="VulnServers" value="@(_settings.GetValue(SettingsHelper.VULNSERVERS_KEY))" asp-for="VulnServers"/>
+            <textarea id="@(SettingsHelper.VULNSERVERS_KEY)" type="text" class="form-control" name="VulnServers" value="@(_settings.GetValue(SettingsHelper.VULNSERVERS_KEY))" asp-for="VulnServers"></textarea>
         </div>
         <div class="form-group">
             <label for="AttackServers">Attacking servers:</label>

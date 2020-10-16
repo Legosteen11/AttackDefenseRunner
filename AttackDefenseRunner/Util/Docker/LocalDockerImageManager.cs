@@ -1,11 +1,14 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AttackDefenseRunner.Model;
+using AttackDefenseRunner.Util.Config;
 using Docker.DotNet;
 using Docker.DotNet.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 using ContainerList = System.Collections.Generic.List<AttackDefenseRunner.Model.DockerContainer>;
 
@@ -16,12 +19,16 @@ namespace AttackDefenseRunner.Util.Docker
         private readonly ADRContext _context;
         private readonly DockerTagManager _tagManager;
         private readonly DockerClient _dockerClient;
+        private readonly FileStrings _files;
+        private readonly SettingsHelper _settings;
         private readonly List<IObserver<List<DockerContainer>>> _observers = new List<IObserver<ContainerList>>();
 
-        public LocalDockerImageManager(ADRContext context, DockerTagManager tagManager, IDockerContainerObserver containerObserver)
+        public LocalDockerImageManager(ADRContext context, DockerTagManager tagManager, IDockerContainerObserver containerObserver, IOptions<FileStrings> files, SettingsHelper settings)
         {
             _context = context;
             _tagManager = tagManager;
+            _files = files.Value;
+            _settings = settings;
             containerObserver.Subscribe(this);
             // TODO: Create something nicer for this so we can add settings etc.
             _dockerClient = new DockerClientConfiguration()
@@ -96,6 +103,9 @@ namespace AttackDefenseRunner.Util.Docker
 
             // Check if there are any running instances of this image
             var runningIds = await GetContainers(TagHelper.GetImage(tagString), TagHelper.CreateImageOnlyName(tagString, tag.DockerImageId));
+            
+            // Update targets
+            await UpdateTargets();
 
             bool alreadyRunning = false;
             DockerContainer runningContainer = null;
@@ -148,6 +158,20 @@ namespace AttackDefenseRunner.Util.Docker
 
             await Notify();
         }
+
+        public async Task UpdateTargets(ICollection<string> targets)
+        {
+            Log.Information("Updating targets to {@targets}", targets);
+
+            Directory.CreateDirectory(_files.TargetFileDir);
+            
+            await using var file = File.CreateText(_files.TargetFileLocation);
+            
+            await file.WriteAsync(string.Join("\n", targets));
+        }
+        
+        private async Task UpdateTargets()
+            => await UpdateTargets(_settings.GetValue(SettingsHelper.VULNSERVERS_KEY).Split("\n"));
 
         private async Task<ICollection<ContainerListResponse>> GetContainers(string imageString, string nameString)
             => (await _dockerClient.Containers.ListContainersAsync(new ContainersListParameters
