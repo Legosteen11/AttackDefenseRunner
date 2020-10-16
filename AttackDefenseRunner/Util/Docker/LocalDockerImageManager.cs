@@ -50,6 +50,7 @@ namespace AttackDefenseRunner.Util.Docker
             {
                 Image = tag.Tag,
                 Name = containerName,
+                Tty = true,
                 HostConfig = new HostConfig
                 {
                     RestartPolicy = new RestartPolicy

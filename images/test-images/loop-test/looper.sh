@@ -1,2 +1,9 @@
 #!/bin/bash
-while read -r line; do python script.py $line; done < $1
+echo "Starting exploit loop..."
+while :
+do
+  while read -r line
+  do
+    echo $(python script.py "$line")
+  done < $1
+done
