@@ -7,6 +7,7 @@ using AttackDefenseRunner.Model;
 using AttackDefenseRunner.Util.Parsing;
 using AttackDefenseRunner.Util.Parsing.Json;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 using ContainerList = System.Collections.Generic.List<AttackDefenseRunner.Model.DockerContainer>;
 
@@ -21,14 +22,16 @@ namespace AttackDefenseRunner.Util.Docker
         private readonly DockerTagManager _tagManager;
         private readonly IRemoteWorkerManager _workManager;
         private readonly HttpClient _httpClient;
+        private readonly SettingsHelper _settings;
         private readonly List<IObserver<List<DockerContainer>>> _observers = new List<IObserver<ContainerList>>();
 
-        public RemoteDockerImageManager(ADRContext context, DockerTagManager tagManager, IRemoteWorkerManager workManager, HttpClient httpClient)
+        public RemoteDockerImageManager(ADRContext context, DockerTagManager tagManager, IRemoteWorkerManager workManager, HttpClient httpClient, SettingsHelper settings)
         {
             _context = context;
             _tagManager = tagManager;
             _workManager = workManager;
             _httpClient = httpClient;
+            _settings = settings;
         }
 
         public async Task<DockerContainer> StartContainer(DockerTag tag)
@@ -39,22 +42,63 @@ namespace AttackDefenseRunner.Util.Docker
 
             var jsonString = $"{{\"Tag\"=\"{tag.Tag}\"}}";
 
-            return await ApiPost<DockerContainer>(worker, Endpoint.UPDATE_IMAGE, jsonString);
+            var returnedContainer = await ApiPost<DockerContainer>(worker, Endpoint.UPDATE_IMAGE, jsonString);
+            
+            DockerContainer dockerContainer = new DockerContainer
+            {
+                DockerTag = tag,
+                DockerId = returnedContainer.DockerId
+            };
+
+            await _context.AddAsync(dockerContainer);
+            await _context.SaveChangesAsync();
+
+            await Notify();
+
+            return dockerContainer;
         }
 
-        public Task StopContainer(string id)
+        public async Task StopContainer(string id)
         {
-            throw new NotImplementedException();
+            Log.Information("Stopping container {id}", id);
+            
+            var workers = await _workManager.GetWorkers();
+
+            foreach (var worker in workers)
+            {
+                await ApiPost<string>(worker, Endpoint.CONTAINER_BASE + $"/{id}" + Endpoint.STOP, string.Empty);
+            }
         }
 
-        public Task<DockerContainer> UpdateImage(string tagString)
+        public async Task<DockerContainer> UpdateImage(string tagString)
         {
-            throw new NotImplementedException();
+            Log.Information("Updating image {tag}", tagString);
+            
+            // Stop all instances of this image
+            await StopImage(tagString);
+            
+            // Get or create the tag
+            DockerTag tag = await _tagManager.GetOrCreateTag(tagString);
+
+            // Update targets
+            await UpdateTargets();
+
+            // Start the container
+            DockerContainer runningContainer = await StartContainer(tag);
+
+            return runningContainer;
         }
 
-        public Task StopImage(string tag)
+        public async Task StopImage(string tag)
         {
-            throw new NotImplementedException();
+            Log.Information("Stopping image {tag}", tag);
+            
+            var workers = await _workManager.GetWorkers();
+
+            foreach (var worker in workers)
+            {
+                await ApiPost<string>(worker, Endpoint.IMAGE_BASE + $"/{tag}" + Endpoint.STOP, string.Empty);
+            }
         }
 
         public async Task<UsageJson> GetUsage()
@@ -65,18 +109,38 @@ namespace AttackDefenseRunner.Util.Docker
                 CpuSet = false
             };
 
-            foreach (var usage in await GetUsages())
+            foreach (var (worker, usage) in await GetUsages())
             {
-                
+                if (usage.CpuSet)
+                {
+                    totalUsage.CpuSet = true;
+                    totalUsage.CpuLeft += usage.CpuLeft;
+                    totalUsage.CpuUsage += usage.CpuUsage;
+                    totalUsage.CpuTotalAvailable += usage.CpuTotalAvailable;
+                }
+
+                if (usage.MemorySet)
+                {
+                    totalUsage.MemorySet = true;
+                    totalUsage.MemoryLeft += usage.MemoryLeft;
+                    totalUsage.MemoryUsage += usage.MemoryUsage;
+                    totalUsage.MemoryTotalAvailable += usage.MemoryTotalAvailable;
+                }
             }
 
             return totalUsage;
         }
 
-        public Task UpdateTargets(ICollection<string> targets)
+        public async Task UpdateTargets(ICollection<string> targets)
         {
-            throw new NotImplementedException();
+            foreach (var worker in await _workManager.GetWorkers())
+            {
+                await ApiPost<string>(worker, Endpoint.TARGETS_BASE, string.Join("\n", targets));
+            }
         }
+        
+        private async Task UpdateTargets()
+            => await UpdateTargets(_settings.GetValue(SettingsHelper.VULNSERVERS_KEY).Split("\n"));
 
         private async Task<Dictionary<RemoteWorker, UsageJson>> GetUsages()
         {
@@ -111,7 +175,7 @@ namespace AttackDefenseRunner.Util.Docker
 
             content = result.Content.ToString();
 
-            return content == null ? default : JsonUtil.FromString<T>(content);
+            return string.IsNullOrEmpty(content) ? default : JsonUtil.FromString<T>(content);
         }
 
         private async Task Notify()

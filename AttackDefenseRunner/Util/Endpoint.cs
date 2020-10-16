@@ -9,5 +9,6 @@ namespace AttackDefenseRunner.Util
         public const string IMAGE_BASE = API_BASE + "/image";
         public const string UPDATE_IMAGE = IMAGE_BASE + "/update";
         public const string STOP = "/stop";
+        public const string TARGETS_BASE = API_BASE + "/target";
     }
 }
