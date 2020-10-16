@@ -18,12 +18,14 @@ namespace AttackDefenseRunner.Controllers
         private readonly IDockerImageManager _imageManager;
         private readonly ADRContext _context;
         private readonly DockerImageJsonParser _parser;
+        private readonly SettingsHelper _settingsHelper;
 
-        public DockerImageController(IDockerImageManager imageManager, DockerImageJsonParser parser, ADRContext context)
+        public DockerImageController(IDockerImageManager imageManager, DockerImageJsonParser parser, ADRContext context, SettingsHelper settingsHelper)
         {
             _imageManager = imageManager;
             _parser = parser;
             _context = context;
+            _settingsHelper = settingsHelper;
         }
 
         [HttpGet(Endpoint.CONTAINER_BASE)]
@@ -62,14 +64,24 @@ namespace AttackDefenseRunner.Controllers
 
         [HttpPost(Endpoint.IMAGE_BASE + Endpoint.ID + Endpoint.STOP)]
         public async Task StopImage(string id)
-        {
-            await _imageManager.StopImage(id);
-        }
-        
+            => await _imageManager.StopImage(id);
+
         [HttpPost(Endpoint.CONTAINER_BASE + Endpoint.ID + Endpoint.STOP)]
         public async Task StopContainer(string id)
+            => await _imageManager.StopContainer(id);
+
+        [HttpGet(Endpoint.USAGE_BASE)]
+        public async Task<UsageJson> GetUsage()
+            => await _imageManager.GetUsage();
+
+        [HttpPost(Endpoint.TARGETS_BASE)]
+        public async Task UpdateTargets()
         {
-            await _imageManager.StopContainer(id);
+            var req = Request.Body.ToString() ?? "";
+
+            _settingsHelper.SetValue(SettingsHelper.VULNSERVERS_KEY, req);
+
+            await _imageManager.UpdateTargets(req.Split("\n"));
         }
     }
 }

@@ -50,6 +50,7 @@ namespace AttackDefenseRunner
             services.AddSingleton<IFlagSubmitter, LogFlagSubmitter>();
             services.AddSingleton<IDockerContainerObserver, SimpleDockerContainerObserver>();
             services.AddSingleton<DockerImageJsonParser>();
+            services.AddSingleton<IRemoteWorkerManager, MemoryRemoteWorkerManager>();
             
             // SignalR
             services.AddSignalR();
