@@ -1,6 +1,7 @@
 using AttackDefenseRunner.Hubs;
 using AttackDefenseRunner.Model;
 using AttackDefenseRunner.Util;
+using AttackDefenseRunner.Util.Config;
 using AttackDefenseRunner.Util.Docker;
 using AttackDefenseRunner.Util.Flag;
 using AttackDefenseRunner.Util.Parsing;
@@ -32,6 +33,9 @@ namespace AttackDefenseRunner
             // Db Contexts
             services.AddDbContext<ADRContext>(options =>
                 options.UseNpgsql(Configuration.GetConnectionString("ADRContext")));
+            
+            // Config
+            services.Configure<FileStrings>(Configuration.GetSection("FileStrings"));
             
             // Scoped
             services.AddScoped<SettingsHelper>();
