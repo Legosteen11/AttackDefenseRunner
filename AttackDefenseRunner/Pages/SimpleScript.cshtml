@@ -9,27 +9,32 @@
 
 <h1 class="display-4">Simple Script</h1>
 <div class="container pt-3">
-    <h2>Enter name of script:</h2>
+    <form method="post">
+        <h2>Enter name of script:</h2>
         <p>If the name is duplicate it will replace the old script</p>
         <div class="form-group">
-            <input id="name" type="text" class="form-control" name="name" asp-for="name"></input>
+            <input id="name" type="text" class="form-control" name="Name" asp-for="Name"></input>
         </div>
-    <h2>Enter extra python modules if needed:</h2>
-    <p>Separated by semicolons (;)</p>
-    <div class="form-group">
-        <input id="requirements" type="text" class="form-control" name="requirements" asp-for="requirements"></input>
-    </div>
-    <hr/>
-    <h2>Enter python3 code:</h2>
-    <p style="color: gray; font-family: Consolas">
-        #!/usr/local/bin/python<br/>
-        import sys<br/>
-        from pwn import *<br/>
-        ip = sys.argv[1]<br/>
-    </p>
-    <div class="form-group">
-        <textarea id="pythoncode" type="text" class="form-control" name="pythoncode" asp-for="pythoncode"></textarea>
-    </div>
-    <button type="submit" class="btn btn-primary" asp-page-handler="Submit">Submit</button>
+        <h2>Enter extra python modules if needed:</h2>
+        <p>Separated by semicolons (;)</p>
+        <div class="form-group">
+            <input id="requirements" type="text" class="form-control" name="Requirements" asp-for="Requirements"></input>
+        </div>
+        <hr/>
+        <h2>Enter python3 code:</h2>
+       
+        <div class="form-group">
+            <textarea rows="30" id="pythoncode" type="text" class="form-control" name="PythonCode" asp-for="PythonCode">
+            </textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" asp-page-handler="SimpleScript">Submit</button>
+    </form>
 </div>
+
+<script>
+document.getElementById("pythoncode").value =  "#!/usr/local/bin/\n"+
+                                               "import sys\n"+
+                                               "from pwn import *\n"+
+                                               "ip = sys.argv[1]";
+</script>
 

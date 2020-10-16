@@ -3,6 +3,7 @@ using AttackDefenseRunner.Util;
 using AttackDefenseRunner.Util.Docker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Routing;
 using Serilog;
 
 namespace AttackDefenseRunner.Pages
@@ -19,16 +20,30 @@ namespace AttackDefenseRunner.Pages
         }
 
         [BindProperty]
-        public string name { get; set; }
+        public string Name { get; set; }
         [BindProperty]
-        public string requirements { get; set; }
+        public string Requirements { get; set; }
 
         [BindProperty]
-        public string pythoncode { get; set; }
+        public string PythonCode { get; set; }
 
-        public async Task OnPostSubmit()
+        public async Task OnPostSimpleScript()
         {
+            var name = Name;
+            var requirements = Requirements;
+            var pythoncode = PythonCode;
 
+            Log.Information("A user submitted a simple script with the following values:");
+            Log.Information($"Name: {name}", name);
+            Log.Information($"Requirements: {requirements}",requirements);
+            Log.Information($"Python code: {pythoncode}", pythoncode);
+            
+            foreach (var req in requirements.Split(';'))
+            {
+                //TODO add each element as a line in requirements.txt
+            }
+            
+            
         }
     }
 }
