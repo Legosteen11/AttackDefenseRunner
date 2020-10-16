@@ -1,4 +1,6 @@
-﻿using AttackDefenseRunner.Util;
+﻿using System.Threading.Tasks;
+using AttackDefenseRunner.Util;
+using AttackDefenseRunner.Util.Docker;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Serilog;
@@ -9,11 +11,13 @@ namespace AttackDefenseRunner.Pages
     {
         private readonly SettingsHelper _settings;
         private readonly ServiceManager _manager;
+        private readonly IDockerImageManager _imageManager;
 
-        public ConfigModel(SettingsHelper settings, ServiceManager manager)
+        public ConfigModel(SettingsHelper settings, ServiceManager manager, IDockerImageManager imageManager)
         {
             _settings = settings;
             _manager = manager;
+            _imageManager = imageManager;
         }
 
 
@@ -26,7 +30,7 @@ namespace AttackDefenseRunner.Pages
         [BindProperty]
         public string AttackServers { get; set; }
 
-        public void OnPostConfig()
+        public async Task OnPostConfig()
         {
             var flagregex = FlagRegex;
             var vulnservers = VulnServers;
@@ -40,6 +44,8 @@ namespace AttackDefenseRunner.Pages
             // TODO: Add the vulnservers to the database
             _settings.SetValue(SettingsHelper.VULNSERVERS_KEY, vulnservers);
             // TODO: Add the attackservers to the database
+            await _imageManager.UpdateTargets(vulnservers.Split("\n"));
+            
             _settings.SetValue(SettingsHelper.ATTACKSERVERS_KEY, attackservers);
         }
         
