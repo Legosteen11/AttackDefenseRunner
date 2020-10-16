@@ -27,7 +27,7 @@ namespace AttackDefenseRunner.Pages
         [BindProperty]
         public string PythonCode { get; set; }
 
-        public async Task OnPostSimpleScript()
+        public void OnPostSimpleScript()
         {
             var name = Name;
             var requirements = Requirements;

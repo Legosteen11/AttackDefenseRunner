@@ -20,11 +20,9 @@
         <div class="form-group">
             <input id="requirements" type="text" class="form-control" name="Requirements" asp-for="Requirements"></input>
         </div>
-        <hr/>
         <h2>Enter python3 code:</h2>
-       
         <div class="form-group">
-            <textarea rows="30" id="pythoncode" type="text" class="form-control" name="PythonCode" asp-for="PythonCode">
+            <textarea style="font-family: 'Fira Code'" rows="30" id="pythoncode" type="text" class="form-control" name="PythonCode" asp-for="PythonCode">
             </textarea>
         </div>
         <button type="submit" class="btn btn-primary" asp-page-handler="SimpleScript">Submit</button>
@@ -35,6 +33,9 @@
 document.getElementById("pythoncode").value =  "#!/usr/local/bin/\n"+
                                                "import sys\n"+
                                                "from pwn import *\n"+
-                                               "ip = sys.argv[1]";
+                                               "ip = sys.argv[1]\n" +
+                                               "# Print text to stdout including flags and they will be submitted.\n" +
+                                               "# Write your code to exploit only one ip address.\n" +
+                                               "# You can use pwntools";
 </script>
 

@@ -1,5 +1,4 @@
 #!/bin/bash
-echo "Starting exploit loop..."
 while :
 do
   while read -r line
