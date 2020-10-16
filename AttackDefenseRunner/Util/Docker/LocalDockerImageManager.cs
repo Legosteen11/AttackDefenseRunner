@@ -55,6 +55,10 @@ namespace AttackDefenseRunner.Util.Docker
                     RestartPolicy = new RestartPolicy
                     {
                         Name = RestartPolicyKind.Always
+                    },
+                    Binds = new List<string>
+                    {
+                        _files.TargetFileLocation + ":" + _files.TargetFileLocationDocker
                     }
                 }
             });
