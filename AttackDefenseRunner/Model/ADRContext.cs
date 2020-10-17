@@ -12,5 +12,6 @@ namespace AttackDefenseRunner.Model
         public DbSet<DockerImage> DockerImages { get; set; }
         public DbSet<DockerContainer> DockerContainers { get; set; }
         public DbSet<DockerTag> DockerTags { get; set; }
+        public DbSet<TemplateImage> TemplateImages { get; set; }
     }
 }

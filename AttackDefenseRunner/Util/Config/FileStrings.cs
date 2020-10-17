@@ -5,5 +5,6 @@ namespace AttackDefenseRunner.Util.Config
         public string TargetFileDir { get; set; } = "/tmp/adr";
         public string TargetFileLocation { get; set; } = "/tmp/adr/targets";
         public string TargetFileLocationDocker { get; set; } = "/tmp/adr/targets";
+        public string CustomImagesDir { get; set; } = "custom-images";
     }
 }
