@@ -19,16 +19,18 @@ namespace AttackDefenseRunner.Util.Flag
         private readonly DockerClient _dockerClient;
         private readonly IFlagSubmitter _flagSubmitter;
         private readonly IServiceProvider _serviceProvider;
+        private readonly RunningSingleton _running;
         private CancellationToken _cancellationToken;
         private bool _streamUpdate;
         private readonly SemaphoreSlim _streamLock = new SemaphoreSlim(1, 1);
 
         private Dictionary<DockerContainer, DateTimeOffset> streams = new Dictionary<DockerContainer, DateTimeOffset>();
 
-        public DockerFlagFinder(IFlagSubmitter flagSubmitter, IServiceProvider serviceProvider, IDockerContainerObserver containerObserver)
+        public DockerFlagFinder(IFlagSubmitter flagSubmitter, IServiceProvider serviceProvider, IDockerContainerObserver containerObserver, RunningSingleton running)
         {
             _flagSubmitter = flagSubmitter;
             _serviceProvider = serviceProvider;
+            _running = running;
             _dockerClient = new DockerClientConfiguration()
                 .CreateClient();
             containerObserver.Subscribe(this);
@@ -82,7 +84,10 @@ namespace AttackDefenseRunner.Util.Flag
 
                     foreach (var flag in lines.SelectMany(line => finder(line)))
                     {
-                        _flagSubmitter.Submit(flag);
+                        if (_running.Running)
+                        {
+                            _flagSubmitter.Submit(flag);
+                        }
                     }
                 
                     Log.Information("Output of {container}: {@output}", container.DockerId, lines);

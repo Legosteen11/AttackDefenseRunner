@@ -28,6 +28,10 @@
         <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
         <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       </Content>
+      <Content Update="Pages\SimpleScript.cshtml">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
     <ItemGroup>
@@ -39,6 +43,9 @@
       </Compile>
       <Compile Update="Pages\Submission.cshtml.cs">
         <DependentUpon>Submission.cshtml</DependentUpon>
+      </Compile>
+      <Compile Update="Pages\SimpleScript.cshtml.cs">
+        <DependentUpon>SimpleScript.cshtml</DependentUpon>
       </Compile>
     </ItemGroup>
 

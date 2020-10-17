@@ -1,0 +1,41 @@
+﻿@page
+@using AttackDefenseRunner.Util
+@model SimpleScript
+@{
+    ViewData["Title"] = "Simple Script";
+}
+@inject SettingsHelper _settings
+@inject RunningSingleton _running
+
+<h1 class="display-4">Simple Script</h1>
+<div class="container pt-3">
+    <form method="post">
+        <h2>Enter name of script:</h2>
+        <p>If the name is duplicate it will replace the old script</p>
+        <div class="form-group">
+            <input id="name" type="text" class="form-control" name="Name" asp-for="Name"></input>
+        </div>
+        <h2>Enter extra python modules if needed:</h2>
+        <p>Separated by semicolons (;)</p>
+        <div class="form-group">
+            <input id="requirements" type="text" class="form-control" name="Requirements" asp-for="Requirements"></input>
+        </div>
+        <h2>Enter python3 code:</h2>
+        <div class="form-group">
+            <textarea style="font-family: 'Fira Code'" rows="30" id="pythoncode" type="text" class="form-control" name="PythonCode" asp-for="PythonCode">
+            </textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" asp-page-handler="SimpleScript">Submit</button>
+    </form>
+</div>
+
+<script>
+document.getElementById("pythoncode").value =  "#!/usr/local/bin/\n"+
+                                               "import sys\n"+
+                                               "from pwn import *\n"+
+                                               "ip = sys.argv[1]\n" +
+                                               "# Print text to stdout including flags and they will be submitted.\n" +
+                                               "# Write your code to exploit only one ip address.\n" +
+                                               "# You can use pwntools";
+</script>
+
